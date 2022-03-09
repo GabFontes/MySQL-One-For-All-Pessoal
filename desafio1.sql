@@ -1,5 +1,5 @@
 DROP SCHEMA IF EXISTS `SpotifyClone`;
-CREATE SCHEMA IF NOT EXISTS `SpotifyClone`;
+CREATE SCHEMA `SpotifyClone`;
 
 CREATE TABLE `SpotifyClone`.`User`(
 	`user_id` INT NOT NULL AUTO_INCREMENT,
@@ -20,8 +20,8 @@ PRIMARY KEY (`plan_id`)
 CREATE TABLE `SpotifyClone`.`PlaybackHistory`(
     `user_id` INT NOT NULL,
     `song_id` INT NOT NULL,
-    `reproduction_date` VARCHAR(100) NOT NULL,
-CONSTRAINT PRIMARY KEY (`user_id`, `song_id`)
+    `reproduction_date` DATETIME NOT NULL,
+PRIMARY KEY (`user_id`, `song_id`)
 );
 
 CREATE TABLE `SpotifyClone`.`FollowingArtists`(
@@ -55,38 +55,31 @@ PRIMARY KEY (`song_id`)
 );
 
 ALTER TABLE `SpotifyClone`.`PlaybackHistory`
-ADD CONSTRAINT `fk_history_user_id`
-FOREIGN KEY (`user_id`)
+ADD FOREIGN KEY (`user_id`)
 REFERENCES `User`(`user_id`);
 
 ALTER TABLE `SpotifyClone`.`PlaybackHistory`
-ADD CONSTRAINT `fk_history_song_id`
-FOREIGN KEY (`song_id`)
+ADD FOREIGN KEY (`song_id`)
 REFERENCES `Songs`(`song_id`);
 
 ALTER TABLE `SpotifyClone`.`FollowingArtists`
-ADD CONSTRAINT `fk_followingArt_artists_id`
-FOREIGN KEY (`artist_id`)
+ADD FOREIGN KEY (`artist_id`)
 REFERENCES `Artists`(`artist_id`);
 
 ALTER TABLE `SpotifyClone`.`FollowingArtists`
-ADD CONSTRAINT `fk_followingArt_user_id`
-FOREIGN KEY (`user_id`)
+ADD FOREIGN KEY (`user_id`)
 REFERENCES `User`(`user_id`);
 
 ALTER TABLE `SpotifyClone`.`Album` 
-ADD CONSTRAINT `fk_album_artist_id`
-FOREIGN KEY (`artist_id`)
+ADD FOREIGN KEY (`artist_id`)
 REFERENCES `Artists`(`artist_id`);
 
 ALTER TABLE `SpotifyClone`.`Songs`
-ADD CONSTRAINT `fk_songs_album_id`
-FOREIGN KEY (`album_id`)
+ADD FOREIGN KEY (`album_id`)
 REFERENCES `Album`(`album_id`);
 
 ALTER TABLE `SpotifyClone`.`Songs`
-ADD CONSTRAINT `fk_songs_artists_id`
-FOREIGN KEY (`artist_id`)
+ADD FOREIGN KEY (`artist_id`)
 REFERENCES `Artists`(`artist_id`);
 
 ALTER TABLE `SpotifyClone`.`User`
