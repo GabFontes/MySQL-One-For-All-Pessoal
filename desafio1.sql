@@ -1,64 +1,82 @@
-DROP SCHEMA IF EXISTS `SpotifyClone`;
-CREATE SCHEMA `SpotifyClone`;
+DROP DATABASE IF EXISTS SpotifyClone;
 
-CREATE TABLE `SpotifyClone`.`Plan`(
-	`plan_id` INT PRIMARY KEY AUTO_INCREMENT, 
-    `plan_type` VARCHAR(30) NOT NULL,
-    `plan_value` DECIMAL(5,2) NOT NULL
+CREATE DATABASE IF NOT EXISTS SpotifyClone;
+
+CREATE TABLE SpotifyClone.Artist(
+    artist_id INT PRIMARY KEY AUTO_INCREMENT,
+	artist_name VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE `SpotifyClone`.`User`(
-	`user_id` INT PRIMARY KEY AUTO_INCREMENT,
-	`username` VARCHAR(100) NOT NULL,
-	`age` INT NOT NULL,
-	`plan_date` DATETIME NOT NULL,
-    `plan_id` INT NOT NULL,
-FOREIGN KEY (`plan_id`) REFERENCES `Plan`(`plan_id`)
+CREATE TABLE SpotifyClone.Plan(
+    plan_id INT PRIMARY KEY AUTO_INCREMENT,
+	plan_type VARCHAR(50) NOT NULL,
+    plan_value DECIMAL(5,2) NOT NULL
 );
 
-CREATE TABLE `SpotifyClone`.`Artists`(
-	`artist_id` INT PRIMARY KEY  AUTO_INCREMENT,
-    `first_name` VARCHAR(50) NOT NULL,
-    `last_name` VARCHAR(50) DEFAULT NULL
+CREATE TABLE SpotifyClone.`User`(
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_name VARCHAR(50) NOT NULL,
+    age INT NOT NULL,
+    plan_date DATETIME NOT NULL,
+    plan_id INT NOT NULL,
+    FOREIGN KEY (plan_id) REFERENCES Plan(plan_id)
 );
 
-CREATE TABLE `SpotifyClone`.`Album`(
-	`album_id` INT PRIMARY KEY AUTO_INCREMENT,
-    `album_name` VARCHAR(100) NOT NULL,
-    `release_year` INT NOT NULL,
-    `artist_id` INT NOT NULL,
-FOREIGN KEY (`artist_id`) REFERENCES `Artists`(`artist_id`)
+CREATE TABLE SpotifyClone.Album(
+    album_id INT PRIMARY KEY AUTO_INCREMENT,
+	album_name VARCHAR(100) NOT NULL,
+    release_year INT NOT NULL,
+    artist_id INT NOT NULL,
+    FOREIGN KEY (artist_id) REFERENCES Artist(artist_id)
 );
 
-CREATE TABLE `SpotifyClone`.`Songs`(
-	`song_id` INT PRIMARY KEY AUTO_INCREMENT,
-    `song_name` VARCHAR(100) NOT NULL,
-    `duration` INT NOT NULL,
-    `artist_id` INT NOT NULL,
-    `album_id` INT NOT NULL,
-FOREIGN KEY (`artist_id`) REFERENCES `Artists`(`artist_id`),
-FOREIGN KEY (`album_id`) REFERENCES `Album`(`album_id`)
+CREATE TABLE SpotifyClone.Songs(
+    song_id INT PRIMARY KEY AUTO_INCREMENT,
+	song_name VARCHAR(100) NOT NULL,
+    duration INT NOT NULL,	
+    artist_id INT NOT NULL,
+    album_id INT NOT NULL,
+    FOREIGN KEY (artist_id) REFERENCES Artist(artist_id),
+    FOREIGN KEY (album_id) REFERENCES Album(album_id)
 );
 
-CREATE TABLE `SpotifyClone`.`PlaybackHistory`(
-	`song_id` INT NOT NULL,
-    `user_id` INT NOT NULL,
-    `reproduction_date` DATETIME NOT NULL,
-PRIMARY KEY (`song_id`, `user_id`),
-FOREIGN KEY (`song_id`) REFERENCES `Songs`(`song_id`),
-FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`)
+CREATE TABLE SpotifyClone.PlaybackHistory(
+    song_id INT NOT NULL,
+	user_id INT NOT NULL,
+    reproduction_date DATETIME NOT NULL,
+    CONSTRAINT PRIMARY KEY (song_id, user_id),
+    FOREIGN KEY (song_id) REFERENCES Songs(song_id),
+    FOREIGN KEY (user_id) REFERENCES `User`(user_id)
 );
 
-CREATE TABLE `SpotifyClone`.`FollowingArtists`(
-	`user_id` INT NOT NULL,
-    `artist_id` INT NOT NULL,
-PRIMARY KEY (`user_id`, `artist_id`),
-FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`),
-FOREIGN KEY (`artist_id`) REFERENCES `Artists`(`artist_id`)
+CREATE TABLE SpotifyClone.FollowingArtists(
+	user_id INT NOT NULL,
+    artist_id INT NOT NULL,
+    CONSTRAINT PRIMARY KEY (user_id, artist_id),
+    FOREIGN KEY (user_id) REFERENCES `User`(user_id),
+    FOREIGN KEY (artist_id) REFERENCES Artist(artist_id)
 );
 
-INSERT INTO `SpotifyClone`.`User` (`username`, `age`, `plan_date`, `plan_id`)
-VALUES ('Thati', 23, '2019-10-20', 1),
+
+INSERT INTO SpotifyClone.Artist (artist_name)
+VALUES
+  ('Walter Phoenix'),
+  ('Peter Strong'),
+  ('Lance Day'),
+  ('Freedie Shannon'),
+  ('Tyler Isle'),
+  ('Fog');
+
+INSERT INTO SpotifyClone.Plan (plan_type, plan_value)
+VALUES
+  ('gratuito', 0),
+  ('familiar', 7.99),
+  ('universitário', 5.99),
+  ('pessoal', 6.99);
+
+INSERT INTO SpotifyClone.`User` (`user_name`, age, plan_date, plan_id)
+VALUES
+  ('Thati', 23, '2019-10-20', 1),
   ('Cintia', 35, '2017-12-30', 2),
   ('Bill', 20, '2019-06-05', 3),
   ('Roger', 45, '2020-05-13', 4),
@@ -68,23 +86,10 @@ VALUES ('Thati', 23, '2019-10-20', 1),
   ('Carol', 19, '2018-02-14', 3),
   ('Angelina', 42, '2018-04-29', 2),
   ('Paul', 46, '2017-01-17', 2);
-  
-INSERT INTO `SpotifyClone`.`Plan` (`plan_type`, `plan_value`) 
-VALUES ('gratuito', 0),
-  ('familiar', 7.99),
-  ('universitário', 5.99),
-  ('pessoal', 6.99);
 
-INSERT INTO `SpotifyClone`.`Artists` (`first_name`, `last_name`) 
-VALUES ('Walter', 'Phoenix'),
-  ('Peter', 'Strong'),
-  ('Lance', 'Day'),
-  ('Freedie', 'Shannon'),
-  ('Tyler', 'Isle'),
-  ('Fog', NULL);
-  
-INSERT INTO `SpotifyClone`.`Album` (`album_name`, `release_year`, `artist_id`)
-VALUES ('Envious', '1990', 1),
+INSERT INTO SpotifyClone.Album (album_name, release_year, artist_id)
+VALUES
+  ('Envious', '1990', 1),
   ('Exuberant', '1993', 1),
   ('Hallowed Steam', '1995', 2),
   ('Incandescent', '1998', 3),
@@ -94,9 +99,10 @@ VALUES ('Envious', '1990', 1),
   ('Cabinet of fools', '2012', 5),
   ('No guarantees', '2015', 5),
   ('Apparatus', '2015', 6);
-  
-INSERT INTO `SpotifyClone`.`Songs` (`song_name`, `duration`, `artist_id`, `album_id`)
-VALUES ('Soul For Us', 200, 1, 1),
+
+INSERT INTO SpotifyClone.Songs (song_name, duration, artist_id, album_id)
+VALUES
+  ('Soul For Us', 200, 1, 1),
   ('Reflections Of Magic', 163, 1, 1),
   ('Dance With Her Own', 116, 1, 1),
   ('Troubles Of My Inner Fire', 203, 1, 2),  
@@ -144,22 +150,10 @@ VALUES ('Soul For Us', 200, 1, 1),
   ("Wouldn't It Be Nice", 213, 6, 10),
   ('Baby', 136, 6, 10),
   ('You Make Me Feel So..', 83, 6, 10);
-  
-INSERT INTO `SpotifyClone`.`FollowingArtists` (`user_id`, `artist_id`)
-VALUES (1, 1), (1, 4),
-	(1, 3), (2, 1),
-    (2, 3), (3, 2),
-    (3, 1), (4, 4),
-	(5, 5), (5, 6),
-	(6, 6), (6, 3),
-    (6, 1), (7, 2),
-    (7, 5), (8, 1),
-    (8, 5), (9, 6),
-    (9, 4), (9, 3),
-	(10, 2), (10, 6);
-    
-INSERT INTO `SpotifyClone`.`PlaybackHistory` (`user_id`, `song_id`, `reproduction_date`)
-VALUES (1, 36, '2020-02-28 10:45:55'),
+
+INSERT INTO SpotifyClone.PlaybackHistory (user_id, song_id, reproduction_date)
+VALUES
+  (1, 36, '2020-02-28 10:45:55'),
   (1, 25, '2020-05-02 05:30:35'),
   (1, 23, '2020-03-06 11:22:33'),
   (1, 14, '2020-08-05 08:05:17'),
@@ -206,3 +200,37 @@ VALUES (1, 36, '2020-02-28 10:45:55'),
   (10, 21, '2017-12-04 05:33:43'),
   (10, 12, '2017-07-27 05:24:49'),
   (10, 13, '2017-12-25 01:03:57');
+
+INSERT INTO SpotifyClone.FollowingArtists (user_id, artist_id)
+VALUES
+  (1, 1),
+  (1, 4),
+  (1, 3),
+
+  (2, 1),
+  (2, 3),
+
+  (3, 2),
+  (3, 1),
+
+  (4, 4),
+
+  (5, 5),
+  (5, 6),
+
+  (6, 6),
+  (6, 3),
+  (6, 1),
+
+  (7, 2),
+  (7, 5),
+
+  (8, 1),
+  (8, 5),
+
+  (9, 6),
+  (9, 4),
+  (9, 3),
+
+  (10, 2),
+  (10, 6);
