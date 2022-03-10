@@ -1,7 +1,7 @@
 SELECT 
 	Us.username AS usuario,
     COUNT(Ph.song_id) AS qtde_musicas_ouvidas,
-    ROUND((SUM(So.duration)/ 60), 2) AS total_minutos
+    ROUND(SUM(So.duration)/60, 2) AS total_minutos
 FROM SpotifyClone.User AS Us
 INNER JOIN SpotifyClone.PlaybackHistory AS Ph
 ON Us.user_id = Ph.user_id
