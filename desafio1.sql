@@ -1,129 +1,99 @@
 DROP SCHEMA IF EXISTS `SpotifyClone`;
 CREATE SCHEMA `SpotifyClone`;
 
+CREATE TABLE `SpotifyClone`.`Plan`(
+	`plan_id` INT PRIMARY KEY AUTO_INCREMENT, 
+    `plan_type` VARCHAR(30) NOT NULL,
+    `plan_value` DECIMAL(5,2) NOT NULL
+);
+
 CREATE TABLE `SpotifyClone`.`User`(
-	`user_id` INT NOT NULL AUTO_INCREMENT,
+	`user_id` INT PRIMARY KEY AUTO_INCREMENT,
 	`username` VARCHAR(100) NOT NULL,
 	`age` INT NOT NULL,
 	`plan_date` DATETIME NOT NULL,
-    `plan_id` INT,
-PRIMARY KEY (`user_id`)
-);
-
-CREATE TABLE `SpotifyClone`.`Plan`(
-	`plan_id` INT NOT NULL AUTO_INCREMENT, 
-    `plan_type` VARCHAR(30) NOT NULL,
-    `plan_value` FLOAT(5,2) NOT NULL,
-PRIMARY KEY (`plan_id`)
-);
-
-CREATE TABLE `SpotifyClone`.`PlaybackHistory`(
-    `user_id` INT NOT NULL,
-    `song_id` INT NOT NULL,
-    `reproduction_date` DATETIME NOT NULL,
-PRIMARY KEY (`user_id`, `song_id`)
-);
-
-CREATE TABLE `SpotifyClone`.`FollowingArtists`(
-	`user_id` INT,
-    `artist_id` INT,
-PRIMARY KEY (`user_id`, `artist_id`)
+    `plan_id` INT NOT NULL,
+FOREIGN KEY (`plan_id`) REFERENCES `Plan`(`plan_id`)
 );
 
 CREATE TABLE `SpotifyClone`.`Artists`(
-	`artist_id` INT NOT NULL AUTO_INCREMENT,
+	`artist_id` INT PRIMARY KEY  AUTO_INCREMENT,
     `first_name` VARCHAR(50) NOT NULL,
-    `last_name` VARCHAR(50) DEFAULT NULL,
-PRIMARY KEY (`artist_id`)
+    `last_name` VARCHAR(50) DEFAULT NULL
 );
 
 CREATE TABLE `SpotifyClone`.`Album`(
-	`album_id` INT NOT NULL AUTO_INCREMENT,
+	`album_id` INT PRIMARY KEY AUTO_INCREMENT,
     `album_name` VARCHAR(100) NOT NULL,
+    `release_year` INT NOT NULL,
     `artist_id` INT NOT NULL,
-	`release_year` INT NOT NULL,
-PRIMARY KEY (`album_id`)
+FOREIGN KEY (`artist_id`) REFERENCES `Artists`(`artist_id`)
 );
 
 CREATE TABLE `SpotifyClone`.`Songs`(
-	`song_id` INT NOT NULL AUTO_INCREMENT,
+	`song_id` INT PRIMARY KEY AUTO_INCREMENT,
     `song_name` VARCHAR(100) NOT NULL,
-    `album_id` INT NOT NULL,
-    `artist_id` INT NOT NULL,
     `duration` INT NOT NULL,
-PRIMARY KEY (`song_id`)
+    `artist_id` INT NOT NULL,
+    `album_id` INT NOT NULL,
+FOREIGN KEY (`artist_id`) REFERENCES `Artists`(`artist_id`),
+FOREIGN KEY (`album_id`) REFERENCES `Album`(`album_id`)
 );
 
-ALTER TABLE `SpotifyClone`.`PlaybackHistory`
-ADD FOREIGN KEY (`user_id`)
-REFERENCES `User`(`user_id`);
+CREATE TABLE `SpotifyClone`.`PlaybackHistory`(
+	`song_id` INT NOT NULL,
+    `user_id` INT NOT NULL,
+    `reproduction_date` DATETIME NOT NULL,
+PRIMARY KEY (`song_id`, `user_id`),
+FOREIGN KEY (`song_id`) REFERENCES `Songs`(`song_id`),
+FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`)
+);
 
-ALTER TABLE `SpotifyClone`.`PlaybackHistory`
-ADD FOREIGN KEY (`song_id`)
-REFERENCES `Songs`(`song_id`);
+CREATE TABLE `SpotifyClone`.`FollowingArtists`(
+	`user_id` INT NOT NULL,
+    `artist_id` INT NOT NULL,
+PRIMARY KEY (`user_id`, `artist_id`),
+FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`),
+FOREIGN KEY (`artist_id`) REFERENCES `Artists`(`artist_id`)
+);
 
-ALTER TABLE `SpotifyClone`.`FollowingArtists`
-ADD FOREIGN KEY (`artist_id`)
-REFERENCES `Artists`(`artist_id`);
-
-ALTER TABLE `SpotifyClone`.`FollowingArtists`
-ADD FOREIGN KEY (`user_id`)
-REFERENCES `User`(`user_id`);
-
-ALTER TABLE `SpotifyClone`.`Album` 
-ADD FOREIGN KEY (`artist_id`)
-REFERENCES `Artists`(`artist_id`);
-
-ALTER TABLE `SpotifyClone`.`Songs`
-ADD FOREIGN KEY (`album_id`)
-REFERENCES `Album`(`album_id`);
-
-ALTER TABLE `SpotifyClone`.`Songs`
-ADD FOREIGN KEY (`artist_id`)
-REFERENCES `Artists`(`artist_id`);
-
-ALTER TABLE `SpotifyClone`.`User`
-ADD FOREIGN KEY (`plan_id`)
-REFERENCES `Plan`(`plan_id`);
-
-
-INSERT INTO `SpotifyClone`.`User` (`user_id`, `username`, `age`, `plan_date`)
-VALUES (1, 'Thati', 23, '2019-10-20'),
-  (2, 'Cintia', 35, '2017-12-30'),
-  (3, 'Bill', 20, '2019-06-05'),
-  (4, 'Roger', 45, '2020-05-13'),
-  (5, 'Norman', 58, '2017-02-17'),
-  (6, 'Patrick', 33, '2017-01-06'),
-  (7, 'Vivian', 26, '2018-01-05'),
-  (8, 'Carol', 19, '2018-02-14'),
-  (9, 'Angelina', 42, '2018-04-29'),
-  (10, 'Paul', 46, '2017-01-17');
+INSERT INTO `SpotifyClone`.`User` (`username`, `age`, `plan_date`, `plan_id`)
+VALUES ('Thati', 23, '2019-10-20', 1),
+  ('Cintia', 35, '2017-12-30', 2),
+  ('Bill', 20, '2019-06-05', 3),
+  ('Roger', 45, '2020-05-13', 4),
+  ('Norman', 58, '2017-02-17', 4),
+  ('Patrick', 33, '2017-01-06', 2),
+  ('Vivian', 26, '2018-01-05', 3),
+  ('Carol', 19, '2018-02-14', 3),
+  ('Angelina', 42, '2018-04-29', 2),
+  ('Paul', 46, '2017-01-17', 2);
   
-INSERT INTO `SpotifyClone`.`Plan` (`plan_id`, `plan_type`, `plan_value`) 
-VALUES (1, 'gratuito', 0),
-  (2, 'universitário', 5.99),
-  (3, 'pessoal', 6.99),
-  (4, 'familiar', 7.99);
+INSERT INTO `SpotifyClone`.`Plan` (`plan_type`, `plan_value`) 
+VALUES ('gratuito', 0),
+  ('familiar', 7.99),
+  ('universitário', 5.99),
+  ('pessoal', 6.99);
 
-INSERT INTO `SpotifyClone`.`Artists` (`artist_id`, `first_name`, `last_name`) 
-VALUES (1, 'Walter', 'Phoenix'),
-  (2, 'Peter', 'Strong'),
-  (3, 'Lance', 'Day'),
-  (4, 'Freedie', 'Shannon'),
-  (5, 'Tyler', 'Isle'),
-  (6, 'Fog', NULL);
+INSERT INTO `SpotifyClone`.`Artists` (`first_name`, `last_name`) 
+VALUES ('Walter', 'Phoenix'),
+  ('Peter', 'Strong'),
+  ('Lance', 'Day'),
+  ('Freedie', 'Shannon'),
+  ('Tyler', 'Isle'),
+  ('Fog', NULL);
   
-INSERT INTO `SpotifyClone`.`Album` (`album_id`, `album_name`, `artist_id`, `release_year`)
-VALUES (1, 'Envious', 1, 1990),
-  (2, 'Exuberant', 1, 1993),
-  (3, 'Hallowed Steam', 2, 1995),
-  (4, 'Incandescent', 3, 1998),
-  (5, 'Temporary Culture', 4, 2001),
-  (6, 'Library of liberty', 4, 2003),
-  (7, 'Chained Down', 5, 2007),
-  (8, 'Cabinet of fools', 5, 2012),
-  (9, 'No guarantees', 5, 2015),
-  (10, 'Apparatus', 6, 2015);
+INSERT INTO `SpotifyClone`.`Album` (`album_name`, `release_year`, `artist_id`)
+VALUES ('Envious', '1990', 1),
+  ('Exuberant', '1993', 1),
+  ('Hallowed Steam', '1995', 2),
+  ('Incandescent', '1998', 3),
+  ('Temporary Culture', '2001', 4),
+  ('Library of liberty', '2003', 4),
+  ('Chained Down', '2007', 5),
+  ('Cabinet of fools', '2012', 5),
+  ('No guarantees', '2015', 5),
+  ('Apparatus', '2015', 6);
   
 INSERT INTO `SpotifyClone`.`Songs` (`song_name`, `duration`, `artist_id`, `album_id`)
 VALUES ('Soul For Us', 200, 1, 1),
