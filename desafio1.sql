@@ -50,7 +50,7 @@ CREATE TABLE SpotifyClone.PlaybackHistory(
 );
 
 CREATE TABLE SpotifyClone.FollowingArtists(
-	user_id INT NOT NULL,
+	  user_id INT NOT NULL,
     artist_id INT NOT NULL,
     CONSTRAINT PRIMARY KEY (user_id, artist_id),
     FOREIGN KEY (user_id) REFERENCES `User`(user_id),
